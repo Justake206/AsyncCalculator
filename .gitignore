@@ -1,0 +1,55 @@
+# ===== Visual Studio =====
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.VC.db
+*.VC.VC.opendb
+*.sln.docstates
+
+# ===== Build results =====
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Bb]uild/
+[Bb]uilds/
+*.obj
+*.exe
+*.pdb
+*.ilk
+*.idb
+*.exp
+*.lib
+*.tlog
+*.log
+
+# ===== Qt generated =====
+moc_*.cpp
+moc_*.h
+qrc_*.cpp
+ui_*.h
+*.pro.user
+*.pro.user.*
+*.qmake.stash
+
+# ===== qmake / Makefile =====
+Makefile
+Makefile.Debug
+Makefile.Release
+
+# ===== OS =====
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# ===== IDE =====
+.vscode/
+.idea/
+*.swp
+*~
+
+# ===== Прочее =====
+*.bak
+*.tmp
