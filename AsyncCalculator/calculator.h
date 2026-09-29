@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QString>
 
+// Worker — выполняет одну арифметическую операцию в отдельном потоке.
+
 class Worker : public QObject
 {
     Q_OBJECT
@@ -15,10 +17,10 @@ public:
     }
 
 public slots:
-    void process();
+    void process();   // точка входа, вызывается после старта потока
 
 signals:
-    void finished(double result);
+    void finished(double result);   // сигнал о завершении вычисления
 
 private:
     Operation m_op;
@@ -26,6 +28,8 @@ private:
     double m_b;
 };
 
+// Calculator — управляет запуском асинхронных операций.
+// Хранит последний результат и счётчик выполненных операций.
 class Calculator : public QObject
 {
     Q_OBJECT
@@ -36,6 +40,7 @@ public:
 
     double result() const { return m_result; }
     bool isBusy() const { return m_busy; }
+    int operationCount() const { return m_operationCount; }
 
 public slots:
     void addAsync(double a, double b);
@@ -45,15 +50,16 @@ public slots:
     void reset();
 
 signals:
-    void resultReady(double result);
-    void errorOccurred(const QString& message);
-    void operationStarted(const QString& name);
+    void resultReady(double result);              // успешное вычисление
+    void errorOccurred(const QString& message);   // любая ошибка
+    void operationStarted(const QString& name);   // операция запущена
 
 private:
     void runInThread(Worker::Operation op, const QString& name, double a, double b);
 
-    double m_result;
-    bool m_busy;
+    double m_result;         // последний результат
+    bool m_busy;             // true, пока операция выполняется
+    int m_operationCount;    // сколько операций выполнено с момента запуска/reset
 };
 
-#endif // CALCULATOR_H
+#endif 

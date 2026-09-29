@@ -16,6 +16,7 @@ void printHelp(QTextStream& out)
     out << "  mul <a> <b>  - умножение (асинхронно)\n";
     out << "  div <a> <b>  - деление (асинхронно)\n";
     out << "  reset        - сброс\n";
+    out << "  stats        - статистика операций\n";
     out << "  version      - информация о программе\n";
     out << "  help         - эта справка\n";
     out << "  quit         - выход\n";
@@ -32,19 +33,23 @@ void printInfo(QTextStream& out)
 int main(int argc, char* argv[])
 {
 #ifdef Q_OS_WIN
-    // Переключаем консоль Windows в режим UTF-8
+    // Без этих строк русский текст в консоли не будет видно
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
 #endif
 
     QCoreApplication app(argc, argv);
 
+    // Потоки ввода/вывода. 
     QTextStream in(stdin);
     QTextStream out(stdout);
     out.setEncoding(QStringConverter::Utf8);
     in.setEncoding(QStringConverter::Utf8);
 
     Calculator calc;
+
+    // Подключаем сигналы калькулятора к обработчикам вывода.
+    // Лямбды захватывают out по ссылке, чтобы писать в консоль.
 
     QObject::connect(&calc, &Calculator::resultReady, [&out](double result) {
         out << "Результат: " << result << "\n> ";
@@ -67,6 +72,8 @@ int main(int argc, char* argv[])
     out << "\n> ";
     out.flush();
 
+    // Таймер опрашивает stdin каждые 50 мс — это не блокирует цикл событий
+    // и позволяет одновременно обрабатывать сигналы из рабочих потоков.
     QTimer inputTimer;
     QObject::connect(&inputTimer, &QTimer::timeout, [&]() {
         if (in.atEnd()) {
@@ -82,9 +89,11 @@ int main(int argc, char* argv[])
                 return;
             }
 
+            // Разбиваем строку на команду и операнды
             QStringList parts = line.split(' ', Qt::SkipEmptyParts);
             QString command = parts.value(0).toLower();
 
+           
             if (command == "quit" || command == "exit") {
                 out << "До свидания!\n";
                 out.flush();
@@ -92,6 +101,7 @@ int main(int argc, char* argv[])
                 return;
             }
 
+            // Справка
             if (command == "help") {
                 printHelp(out);
                 out << "> ";
@@ -99,6 +109,7 @@ int main(int argc, char* argv[])
                 return;
             }
 
+            // Информация о программе
             if (command == "version") {
                 printInfo(out);
                 out << "> ";
@@ -106,17 +117,27 @@ int main(int argc, char* argv[])
                 return;
             }
 
+            // Статистика операций
+            if (command == "stats") {
+                out << "Выполнено операций: " << calc.operationCount() << "\n> ";
+                out.flush();
+                return;
+            }
+
+            // Сброс
             if (command == "reset") {
                 calc.reset();
                 return;
             }
 
+            // Арифметические команды требуют ровно 3 токена
             if (parts.size() != 3) {
                 out << "Ошибка: неверный формат. Используйте: <команда> <a> <b>\n> ";
                 out.flush();
                 return;
             }
 
+            // Преобразование операндов в числа
             bool ok1, ok2;
             double a = parts[1].toDouble(&ok1);
             double b = parts[2].toDouble(&ok2);
@@ -127,6 +148,7 @@ int main(int argc, char* argv[])
                 return;
             }
 
+            // Запуск нужной операции
             if (command == "add") {
                 calc.addAsync(a, b);
             }
@@ -146,7 +168,7 @@ int main(int argc, char* argv[])
         }
         });
 
-    inputTimer.start(50);
+    inputTimer.start(50);   // опрос ввода каждые 50 мс
 
     return app.exec();
 }
