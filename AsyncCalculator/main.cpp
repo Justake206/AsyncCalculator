@@ -16,8 +16,17 @@ void printHelp(QTextStream& out)
     out << "  mul <a> <b>  - умножение (асинхронно)\n";
     out << "  div <a> <b>  - деление (асинхронно)\n";
     out << "  reset        - сброс\n";
+    out << "  version      - информация о программе\n";
     out << "  help         - эта справка\n";
     out << "  quit         - выход\n";
+}
+
+void printInfo(QTextStream& out)
+{
+    out << "=== Async Calculator on Qt ===\n";
+    out << "Лабораторная работа №1. Продвинутый уровень, вариант 5.\n";
+    out << "Асинхронный калькулятор с QThread и сигналами/слотами.\n";
+    out << "Версия Qt: " << qVersion() << "\n";
 }
 
 int main(int argc, char* argv[])
@@ -53,6 +62,7 @@ int main(int argc, char* argv[])
         });
 
     out << "=== Асинхронный калькулятор на Qt ===\n";
+    out << "Лабораторная работа №1. Продвинутый уровень, вариант 5.\n";
     printHelp(out);
     out << "\n> ";
     out.flush();
@@ -84,6 +94,13 @@ int main(int argc, char* argv[])
 
             if (command == "help") {
                 printHelp(out);
+                out << "> ";
+                out.flush();
+                return;
+            }
+
+            if (command == "version") {
+                printInfo(out);
                 out << "> ";
                 out.flush();
                 return;
