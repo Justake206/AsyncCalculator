@@ -149,6 +149,7 @@ QTextStream настроен через setEncoding(QStringConverter::Utf8).
 Ввод/вывод через QTextStream с поддержкой Unicode
 
 Автор
+
 ФИО: Красненькин Роман Александрович
 
 Группа: Пиж-б-о-24-1
